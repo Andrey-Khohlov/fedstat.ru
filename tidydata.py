@@ -1,3 +1,169 @@
+def combiner_02(data_dir):
+    # Подгтовила Мария
+    import os
+    import pandas as pd
+    import numpy as np
+    import openpyxl
+    
+    file_nr =  2
+    result = pd.DataFrame(columns=('Расшифровка', 'Обозреваемый период', 'Единица измерения', 'Единица физических величин', 'Значение', 
+                                   'Дата обновления данных', 'Пол', 'Возраст', 'Тип населенного пункта', 'Частота предоставления данных', 
+                                   'Регион', 'Номер файла',  'Раздел', 'ссылка'))
+    data_name = data_dir + 'data(' + str(file_nr) + ').xls'
+    dict_df = pd.read_excel(data_name, sheet_name=None)
+    df = dict_df['Данные']
+    df1 = dict_df['Паспорт']
+    a1 = df.columns[0] #Расшифровка
+    a2 = df.iloc[2:, 1] # Обозреваемый период
+    a3=df.iloc[2:, 2]# Значения
+    a4 =['рублей на душу населения']
+    length = len(a3) # длина получаемой таблицы
+    output = pd.DataFrame({'Расшифровка': [a1] * length,
+                          'Обозреваемый период':a2.astype(int),
+                          'Единица измерения': [df1.iloc[1, 1][2:]] * length,
+                          'Единица физических величин': a4 * length,
+                          'Значение':a3,
+                          'Дата обновления данных': [df1.iloc[5, 1]] * length,
+                          'Пол':['_T'] * length,
+                          'Возраст': ['_T'] * length,
+                          'Тип населенного пункта': ['_T'] * length,
+                          'Частота предоставления данных': ['A' if df1.iloc[2, 1][:9] == '- Годовая' else df1.iloc[2, 1][2:16]] * length,
+                          'Регион': ['Российская Федерация'] * length,
+                          'Номер файла': [file_nr] * length,
+                          'Раздел':['значение показателя за год'] * length,
+                          'ссылка':'https://www.fedstat.ru/organizations/indicator/59598'
+                          })
+    result = pd.concat([result, output], axis=0)
+    result["Пол"] = np.where(result["Пол"]=="Всего","_T", result["Пол"])
+    result["Пол"]=np.where(result["Пол"]=="Женщины","F", result["Пол"])
+    result["Пол"]=np.where(result["Пол"]=="Мужчины","M", result["Пол"])
+    result["Единица физических величин"]=np.where(result["Единица физических величин"]=="процент","РТ", result["Единица физических величин"])
+    return result
+
+def combiner_11(data_dir):
+    # Подгтовила Мария
+    import os
+    import pandas as pd
+    import numpy as np
+    import openpyxl
+    import re
+    
+    file_nr = 11
+    result = pd.DataFrame(columns=('Расшифровка', 'Обозреваемый период', 'Единица измерения', 'Единица физических величин', 'Значение', 
+                                   'Дата обновления данных', 'Пол', 'Возраст', 'Тип населенного пункта', 'Частота предоставления данных', 
+                                   'Регион', 'Номер файла',  'Раздел', 'ссылка'))
+    data_name = data_dir + 'data(' + str(file_nr) + ').xls'
+    dict_df = pd.read_excel(data_name, sheet_name=None)
+    df = dict_df['Данные']
+    df1 = dict_df['Паспорт']
+    a1 = df.columns[0] #Расшифровка
+    a2 = df.T.iloc[1:, 1] # Обозреваемый период
+    a3=df.iloc[2:, ].iloc[0:,1:].values.ravel()# Значения
+    a4 = [df1.iloc[1, 1][2:]]
+    length = len(a3) # длина получаемой таблицы
+    output = pd.DataFrame({'Расшифровка': [a1] * length,
+                          'Обозреваемый период':a2.astype(int),
+                          'Единица измерения': [df1.iloc[1, 1][2:]] * length,
+                          'Единица физических величин': a4 * length,
+                          'Значение':a3,
+                          'Дата обновления данных': [df1.iloc[5, 1]] * length,
+                          'Пол':['F'] * length,
+                          'Возраст': a1.split('(', 1)[1].split(')')[0] * length,
+                          'Тип населенного пункта': ['_T'] * length,
+                          'Частота предоставления данных': ['A' if df1.iloc[2, 1][:9] == '- Годовая' else df1.iloc[2, 1][2:15]] * length,
+                          'Регион': ['Российская Федерация'] * length,
+                          'Номер файла': [file_nr] * length,
+                          'Раздел':['_T'] * length,
+                          'ссылка':'https://fedstat.ru/indicator/59023'
+                          })
+    result = pd.concat([result, output], axis=0) 
+    result["Единица физических величин"]=np.where(result["Единица физических величин"]=="процент","РТ", result["Единица физических величин"])
+    result["Единица измерения"]=np.where(result["Единица измерения"]=="процент","РТ", result["Единица физических величин"])     
+    return result
+
+def combiner_04(data_dir = '/Users/m/Desktop/Data Analise/Стажировка/'):
+    # Подгтовила Мария
+    import os
+    import pandas as pd
+    import numpy as np
+    import openpyxl
+    import re
+    
+    file_nr = 4
+    result = pd.DataFrame(columns=('Расшифровка', 'Обозреваемый период', 'Единица измерения', 'Единица физических величин', 'Значение', 
+                                   'Дата обновления данных', 'Пол', 'Возраст', 'Тип населенного пункта', 'Частота предоставления данных', 
+                                   'Регион', 'Номер файла',  'Раздел', 'ссылка'))
+    data_name = data_dir + 'data(' + str(file_nr) + ').xls'
+    dict_df = pd.read_excel(data_name, sheet_name=None)
+    df = dict_df['Данные']
+    df1 = dict_df['Паспорт']
+    a1 = df.columns[0] #Расшифровка
+    a2 = df.T.iloc[1:, 1] # Обозреваемый период
+    a3=df.iloc[2:, ].iloc[0:,1:].values.ravel()# Значения
+    a4 = [df1.iloc[1, 1][2:]]
+    length = len(a3) # длина получаемой таблицы
+    output = pd.DataFrame({'Расшифровка': [a1] * length,
+                          'Обозреваемый период':a2.astype(int),
+                          'Единица измерения': [df1.iloc[1, 1][2:]] * length,
+                          'Единица физических величин': a4 * length,
+                          'Значение':a3,
+                          'Дата обновления данных': [df1.iloc[5, 1]] * length,
+                          'Пол':['_T'] * length,
+                          'Возраст': ['_T'] * length,
+                          'Тип населенного пункта': ['_T'] * length,
+                          'Частота предоставления данных': ['A' if df1.iloc[2, 1][:9] == '- Годовая' else df1.iloc[2, 1][2:16]] * length,
+                          'Регион': ['Российская Федерация'] * length,
+                          'Номер файла': [file_nr] * length,
+                          'Раздел':['_T'] * length,
+                          'ссылка':'https://fedstat.ru/indicator/59213'
+                          })
+    result = pd.concat([result, output], axis=0) 
+    result["Единица физических величин"]=np.where(result["Единица физических величин"]=="процент","РТ", result["Единица физических величин"])
+    result["Единица измерения"]=np.where(result["Единица измерения"]=="процент","РТ", result["Единица физических величин"])    
+    return result
+
+def combiner_01(data_dir = '/Users/m/Desktop/Data Analise/Стажировка/'):
+    # Выполнила Мария
+    import os
+    import pandas as pd
+    import numpy as np
+    import openpyxl
+    import re
+    
+    file_nr =  1
+    result = pd.DataFrame(columns=('Расшифровка', 'Обозреваемый период', 'Единица измерения', 'Единица физических величин', 'Значение', 
+                                   'Дата обновления данных', 'Пол', 'Возраст', 'Тип населенного пункта', 'Частота предоставления данных', 
+                                   'Регион', 'Номер файла',  'Раздел', 'ссылка'))
+    data_name = data_dir + 'data(' + str(file_nr) + ').xls'
+    dict_df = pd.read_excel(data_name, sheet_name=None)
+    df = dict_df['Данные']
+    df1 = dict_df['Паспорт']
+    a1 = df.columns[0] #Расшифровка
+    a2 = df.iloc[2:, 0] # Обозреваемый период
+    a3=df.iloc[2:, ].iloc[0:,1:].values.ravel()
+    a4 = [df1.iloc[1, 1][2:]]
+    length = len(a3) # длина получаемой таблицы
+    output = pd.DataFrame({'Расшифровка': [a1] * length,
+                          'Обозреваемый период':a2.repeat(len((df.T.iloc[1:, 1]))).astype(int),
+                          'Единица измерения': [df1.iloc[1, 1][2:]] * length,
+                          'Единица физических величин': a4 * length,
+                          'Значение':a3,
+                          'Дата обновления данных': [df1.iloc[5, 1]] * length,
+                          'Пол':np.tile(df.T.iloc[1:, 1].ravel().astype(str), len(a2)),
+                          'Возраст': ['_T'] * length,
+                          'Тип населенного пункта': ['_T'] * length,
+                          'Частота предоставления данных': ['A' if df1.iloc[2, 1][:9] == '- Годовая' else df1.iloc[2, 1][2:16]] * length,
+                          'Регион': ['Российская Федерация'] * length,
+                          'Номер файла': [file_nr] * length,
+                          'Раздел':['_T'] * length,
+                          'ссылка':'https://www.fedstat.ru/organizations/indicator/58536'})
+    result = pd.concat([result, output], axis=0)
+    result["Пол"] = np.where(result["Пол"]=="Всего","_T", result["Пол"])
+    result["Пол"]=np.where(result["Пол"]=="Женщины","F", result["Пол"])
+    result["Пол"]=np.where(result["Пол"]=="Мужчины","M", result["Пол"])
+    result["Единица физических величин"]=np.where(result["Единица физических величин"]=="процент","РТ", result["Единица физических величин"])
+    return result
+
 def combiner_51(data_dir = '/content/'):
     # Обработка таблицы №51 в Google Colab
     # Выполнил: Арьков Валентин
