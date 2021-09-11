@@ -1,3 +1,153 @@
+def combiner_30(data_dir):
+    import os
+    import pandas as pd
+    import numpy as np
+    import openpyxl
+    # Подгтовила Мария
+    file_nr = 30
+    result = pd.DataFrame(columns=('Расшифровка', 'Обозреваемый период', 'Единица измерения', 'Единица физических величин', 'Значение', 
+                                   'Дата обновления данных', 'Пол', 'Возраст', 'Тип населенного пункта', 'Частота предоставления данных', 
+                                   'Регион', 'Номер файла',  'Раздел', 'ссылка'))
+    data_name = data_dir + 'data(' + str(file_nr) + ').xls'
+    dict_df = pd.read_excel(data_name, sheet_name=None)
+    df = dict_df['Данные']
+    df1 = dict_df['Паспорт']
+    a1 = df.columns[0] #Расшифровка
+    a2 =df.iloc[2:, 1].repeat(len(df.T.iloc[2:, 1]))  # Обозреваемый период
+    a3=df.iloc[2:,].iloc[:,2:].values.ravel()# Значения
+    if file_nr not in (1,2,35, 39, 56):
+        a4 = [df1.iloc[1, 1][2:]]
+    elif file_nr == 35:
+        a4 =['человек на миллион жителей']
+    elif file_nr == 39:
+        a4 = ['Количество исследователей (в эквиваленте полной занятости) на миллион жителей']
+    elif file_nr == 56:
+        a4 =['зарегистрированных больных на 100000 человек']
+    elif file_nr == 1: 
+        a4 =['на 1000 родившихся живыми']
+    elif file_nr == 2: 
+        a4 =['на душу населения']
+    length = len(a2) # длина получаемой таблицы
+    output = pd.DataFrame({'Расшифровка': [a1] * length,
+                          'Обозреваемый период':a2.astype(int),
+                          'Единица измерения': ([df1.iloc[1, 1][2:]])* length,
+                          'Единица физических величин': a4 * length,
+                          'Значение':a3,
+                          'Дата обновления данных': [df1.iloc[5, 1]] * length,
+                          'Пол':df.iloc[2:, 0].repeat(len(df.T.iloc[2:, 1])),
+                          'Возраст':df.T.iloc[2:, 1].values.ravel().repeat(len(df.iloc[2:, 0])),
+                          'Тип населенного пункта': ['_T'] * length,
+                          'Частота предоставления данных': ['A' if df1.iloc[2, 1][:9] == '- Годовая' else df1.iloc[2, 1][2:16]] * length,
+                          'Регион': ['Российская Федерация'] * length,
+                          'Номер файла': [file_nr] * length,
+                          'Раздел':['_T'] * length,
+                          'ссылка':'https://www.fedstat.ru/organizations/indicator/58512'
+                          })
+    result = pd.concat([result, output], axis=0) 
+    result["Единица физических величин"]=np.where(result["Единица физических величин"]=="процент","РТ", result["Единица физических величин"])
+    
+    return result
+
+def combiner_26(data_dir):
+    import os
+    import pandas as pd
+    import numpy as np
+    import openpyxl
+    # Подгтовила Мария
+    file_nr = 26
+    result = pd.DataFrame(columns=('Расшифровка', 'Обозреваемый период', 'Единица измерения', 'Единица физических величин', 'Значение', 
+                                   'Дата обновления данных', 'Пол', 'Возраст', 'Тип населенного пункта', 'Частота предоставления данных', 
+                                   'Регион', 'Номер файла',  'Раздел', 'ссылка'))
+    data_name = data_dir + 'data(' + str(file_nr) + ').xls'
+    dict_df = pd.read_excel(data_name, sheet_name=None)
+    df = dict_df['Данные']
+    df1 = dict_df['Паспорт']
+    a1 = df.columns[0] #Расшифровка
+    a2 = df.iloc[2:, 0] # Обозреваемый период
+    a3=df.iloc[2:, ].iloc[0:,1:].values.ravel()# Значения
+    if file_nr not in (1,2,35, 39, 56):
+        a4 = [df1.iloc[1, 1][2:]]
+    elif file_nr == 35:
+        a4 =['человек на миллион жителей']
+    elif file_nr == 39:
+        a4 = ['Количество исследователей (в эквиваленте полной занятости) на миллион жителей']
+    elif file_nr == 56:
+        a4 =['зарегистрированных больных на 100000 человек']
+    elif file_nr == 1: 
+        a4 =['на 1000 родившихся живыми']
+    elif file_nr == 2: 
+        a4 =['на душу населения']
+    length = len(a3) # длина получаемой таблицы
+    output = pd.DataFrame({'Расшифровка': [a1] * length,
+                          'Обозреваемый период':a2.astype(int),
+                          'Единица измерения': ([df1.iloc[1, 1][2:]])* length,
+                          'Единица физических величин': a4 * length,
+                          'Значение':a3,
+                          'Дата обновления данных': [df1.iloc[5, 1]] * length,
+                          'Пол':['_T'] * length,
+                          'Возраст':['_T'] * length,
+                          'Тип населенного пункта': ['_T'] * length,
+                          'Частота предоставления данных': ['A' if df1.iloc[2, 1][:9] == '- Годовая' else df1.iloc[2, 1][2:16]] * length,
+                          'Регион': ['Российская Федерация'] * length,
+                          'Номер файла': [file_nr] * length,
+                          'Раздел':['_T'] * length,
+                          'ссылка':'https://fedstat.ru/indicator/59557'
+                          })
+    result = pd.concat([result, output], axis=0) 
+    result["Единица физических величин"]=np.where(result["Единица физических величин"]=="процент","РТ", result["Единица физических величин"])
+    
+    return result
+
+def combiner_24(data_dir):
+    import os
+    import pandas as pd
+    import numpy as np
+    import openpyxl
+    # Подгтовила Мария
+    file_nr = 24
+    result = pd.DataFrame(columns=('Расшифровка', 'Обозреваемый период', 'Единица измерения', 'Единица физических величин', 'Значение', 
+                                   'Дата обновления данных', 'Пол', 'Возраст', 'Тип населенного пункта', 'Частота предоставления данных', 
+                                   'Регион', 'Номер файла',  'Раздел', 'ссылка'))
+    data_name = data_dir + 'data(' + str(file_nr) + ').xls'
+    dict_df = pd.read_excel(data_name, sheet_name=None)
+    df = dict_df['Данные']
+    df1 = dict_df['Паспорт']
+    a1 = df.columns[0] #Расшифровка
+    a2 = df.iloc[2:, 0] # Обозреваемый период
+    a3=df.iloc[2:, ].iloc[0:,1:].values.ravel()# Значения
+    if file_nr not in (1,2,35, 39, 56):
+        a4 = [df1.iloc[1, 1][2:]]
+    elif file_nr == 35:
+        a4 =['человек на миллион жителей']
+    elif file_nr == 39:
+        a4 = ['Количество исследователей (в эквиваленте полной занятости) на миллион жителей']
+    elif file_nr == 56:
+        a4 =['зарегистрированных больных на 100000 человек']
+    elif file_nr == 1: 
+        a4 =['на 1000 родившихся живыми']
+    elif file_nr == 2: 
+        a4 =['на душу населения']
+    length = len(a3) # длина получаемой таблицы
+    output = pd.DataFrame({'Расшифровка': [a1] * length,
+                          'Обозреваемый период':a2.astype(int),
+                          'Единица измерения': ([df1.iloc[1, 1][2:]])* length,
+                          'Единица физических величин': a4 * length,
+                          'Значение':a3,
+                          'Дата обновления данных': [df1.iloc[5, 1]] * length,
+                          #'Пол':['_T'] * length,
+                          #'Возраст':df.iloc[2:, 0].repeat(len(a2)).values.ravel(),
+                          #'Тип населенного пункта': ['_T'] * length,
+                          #'Частота предоставления данных': ['A' if df1.iloc[2, 1][:9] == '- Годовая' else df1.iloc[2, 1][2:16]] * length,
+                          #'Регион': ['Российская Федерация'] * length,
+                          #'Номер файла': [file_nr] * length,
+                          #'Раздел':['_T'] * length,
+                          #'ссылка':'https://www.fedstat.ru/organizations/indicator/58465'
+                          })
+    result = pd.concat([result, output], axis=0) 
+    result["Единица физических величин"]=np.where(result["Единица физических величин"]=="процент","РТ", result["Единица физических величин"])
+    
+    return result
+
 def combiner_02(data_dir):
     # Подгтовила Мария
     import os
@@ -344,7 +494,7 @@ def indicators_scrapper(first_ind = '58536', last_ind = '58468'):
             indicators.append(text)
     return indicators
 
-def fedstat_files_loader(indicators):
+def fedstat_files_loader(indicators, executable_path='/home/dad/anaconda3/bin/geckodriver'):
     #  выполнил Андрей Хохлов
     from selenium import webdriver
     from selenium.webdriver import Firefox
